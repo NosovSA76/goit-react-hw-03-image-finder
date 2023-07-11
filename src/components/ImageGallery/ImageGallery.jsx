@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import { animateScroll } from 'react-scroll';
-import imagesAPI from 'services/getImages';
 import React, { Component } from 'react';
 import { List } from './ImageGallery.styled';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
@@ -10,6 +9,7 @@ import ImageErrorView from 'components/ImageErrorView/ImageErrorView';
 import { InitialStateGallery } from '../InitialStateGallery/InitialStateGallery';
 import { Button } from 'components/Button/Button';
 import Modal from 'components/Modal/Modal';
+import imagesAPI from 'services/getImages';
 
 const Status = {
   IDLE: 'idle',
@@ -36,8 +36,6 @@ export default class ImageGallery extends Component {
     modalData: { img: DefaultImg, tags: '' },
   };
 
-  // перевіряємо, щоб в пропсах змінився запит
-  // y static відсутній this, тому дублюємо в state - search: ''
   static getDerivedStateFromProps(nextProps, prevState) {
     if (prevState.value !== nextProps.value) {
       return { page: 1, value: nextProps.value };
@@ -49,11 +47,9 @@ export default class ImageGallery extends Component {
     const { page } = this.state;
     const prevValue = prevProps.value;
     const nextValue = this.props.value;
-    //   страхуємо від повторного запиту, якщо вже таке слово було введене
     if (prevValue !== nextValue || prevState.page !== page) {
       this.setState({ status: Status.PENDING });
 
-      // перевіряємо чи є помилка, якщо є - записуємо null
       if (this.state.error) {
         this.setState({ error: null });
       }
@@ -71,7 +67,6 @@ export default class ImageGallery extends Component {
     }
   }
 
-  // custom method to btn load
  handleLoadMore = () => {
   this.setState(prevState => ({ page: prevState.page + 1 }), () => {
     animateScroll.scrollMore(600);
